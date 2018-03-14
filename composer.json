@@ -1,0 +1,147 @@
+{
+    "name": "sjorek/typo3-unicode-normalization",
+    "type": "typo3-cms-extension",
+    "description": "This extension adds unicode-normalization capabilities to TYPO3.",
+    "license": "GPL-2.0-or-later",
+    "keywords": [
+        "typo3",
+        "unicode",
+        "normalization",
+        "utf8",
+        "filesystem"
+    ],
+    "homepage": "https://sjorek.github.io/typo3-unicode-normalization",
+    "support": {
+        "issues": "https://github.com/sjorek/typo3-unicode-normalization/issues"
+    },
+    "authors": [
+        {
+            "name": "Stephan Jorek",
+            "email": "stephan.jorek@gmail.com",
+            "role": "Developer",
+            "homepage": "https://github.com/sjorek/"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "typo3/cms-core": "^7.6.23 || ^8.7.9 || ^9.1.0",
+        "sjorek/unicode-normalization": "^0.1.1"
+    },
+    "require-dev": {
+        "ext-iconv": "*",
+        "ext-intl": "*",
+        "ext-mbstring": "*",
+        "ext-xdebug": "*",
+        "ext-zlib": "*",
+        "helhum/typo3-composer-setup": "^0.5.1",
+        "typo3/testing-framework": "^1.2.2 || ^2.0.3 || ^3.0",
+        "friendsofphp/php-cs-fixer": "^2.10",
+        "sensiolabs/security-checker": "^4.1",
+        "symfony/filesystem": "^3.4 || ^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sjorek\\UnicodeNormalization\\Typo3Cms\\": "Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sjorek\\UnicodeNormalization\\Typo3Cms\\Tests\\": "Tests/"
+        }
+    },
+    "replace": {
+        "unicode_normalization": "self.version",
+        "typo3-ter/unicode-normalization": "self.version"
+    },
+    "config": {
+        "vendor-dir": ".Build/vendor"
+    },
+    "scripts": {
+        "run:build": [
+            "@run:clean",
+            "@run:cs-lint",
+            "@run:security-check",
+            "@run:report-coverage-html"
+        ],
+        "run:clean": [
+            "@composer run:alter-filesystem -- remove .Build/coverage",
+            "@composer run:alter-filesystem -- remove .Build/coverage.xml",
+            "@composer run:alter-filesystem -- remove .Build/typo3temp"
+        ],
+        "run:test": [
+            "phpunit --colors=always --exclude-group=large"
+        ],
+        "run:test-all": [
+            "phpunit --colors=always"
+        ],
+        "run:test-large": [
+            "phpunit --colors=always --group=large"
+        ],
+        "run:test-coverage": [
+            "phpunit --colors=always --coverage-text"
+        ],
+        "run:test-functional": [
+            "TYPO3_PATH_ROOT=${TYPO3_PATH_ROOT:-$PWD/.Build} typo3DatabaseName=${typo3DatabaseName:-typo3} typo3DatabaseHost=${typo3DatabaseHost:-localhost} typo3DatabaseUsername=${typo3DatabaseUsername:-root} typo3DatabasePassword=${typo3DatabasePassword:-} phpunit --colors=always -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/FunctionalTests.xml Tests/Functional"
+        ],
+        "run:parallel-test-functional": [
+            "find Tests/Functional -type f -name '*Test.php' | TYPO3_PATH_ROOT=${TYPO3_PATH_ROOT:-$PWD/.Build} typo3DatabaseName=${typo3DatabaseName:-typo3} typo3DatabaseHost=${typo3DatabaseHost:-localhost} typo3DatabaseUsername=${typo3DatabaseUsername:-root} typo3DatabasePassword=${typo3DatabasePassword:-} parallel --gnu 'echo; echo \"Running functional test suite {}\"; phpunit -c .Build/vendor/typo3/testing-framework/Resources/Core/Build/FunctionalTests.xml {}'"
+        ],
+        "run:report-coverage-html": [
+            "phpunit --colors=always --coverage-html=.Build/coverage"
+        ],
+        "run:report-coverage-xml": [
+            "phpunit --colors=always --coverage-clover=.Build/coverage.xml"
+        ],
+        "run:cs-lint": [
+            "php-cs-fixer fix --ansi --diff --stop-on-violation --verbose --dry-run --cache-file=.Build/cache/php_cs.json"
+        ],
+        "run:cs-fix": [
+            "php-cs-fixer fix -vv --ansi --cache-file=.Build/cache/php_cs.json"
+        ],
+        "run:security-check": [
+            "security-checker security:check --ansi"
+        ],
+        "run:security-check-bugfix-for-travis": [
+            "security-checker security:check --ansi --end-point=http://security.sensiolabs.org/check_lock"
+        ],
+        "run:require-typo3-version": [
+            "@php -r '$conf=json_decode(file_get_contents(__DIR__.\"/composer.json\"),true);$conf[\"require\"][\"typo3/cms-core\"]=$_SERVER[\"argv\"][1];file_put_contents(__DIR__.\"/composer.json\",json_encode($conf,JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT).chr(10));'",
+            "@composer run:alter-filesystem -- remove composer.lock",
+            "@composer install",
+            "@php -r '$p=@reset(array_filter(json_decode(shell_exec(PHP_BINARY.\" \".getenv(\"COMPOSER_BINARY\").\" show --format=json\"))->installed,function($p){return $p->name===\"typo3/cms-core\";}));$v=ltrim($p->version,\"v\");if(version_compare($v,\"9.1.0\",\">=\")&&version_compare($v, \"9.2.0\", \"<\")){system(sprintf(\"%s %s require --dev typo3/testing-framework:^2.0.3\",escapeshellcmd(PHP_BINARY),escapeshellarg(getenv(\"COMPOSER_BINARY\"))));}'",
+            "@run:clean"
+        ],
+        "run:link-extension": [
+            "@composer run:alter-filesystem -- symlink ../../.. .Build/typo3conf/ext/unicode_normalization"
+        ],
+        "run:alter-filesystem": [
+            "@php -r '$method=$_SERVER[\"argv\"][1];$args=array_map(function($v){return $v===\"EOL\"?PHP_EOL:$v;},array_slice($_SERVER[\"argv\"],2));require\".Build/vendor/autoload.php\";$fs=new Symfony\\Component\\Filesystem\\Filesystem();call_user_func([$fs,$method],...$args);'"
+        ],
+        "run:venv": [
+            "@run:venv-remove",
+            "@run:venv-deploy"
+        ],
+        "run:venv-deploy": [
+            "@composer venv:shell -v --lock",
+            "@composer venv:shell-hook -v --lock",
+            "@composer venv:link -v --lock",
+            "@composer venv:git-hook -v --lock"
+        ],
+        "run:venv-remove": [
+            "@composer venv:shell -v --remove",
+            "@composer venv:shell-hook -v --remove",
+            "@composer venv:link -v --remove",
+            "@composer venv:git-hook -v --remove"
+        ],
+        "post-autoload-dump": [
+            "@run:link-extension",
+            "@composer run:alter-filesystem -- mkdir .Build/cache"
+        ]
+    },
+    "extra": {
+        "typo3/cms": {
+            "cms-package-dir": "{$vendor-dir}/typo3/cms",
+            "web-dir": ".Build"
+        }
+    }
+}

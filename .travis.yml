@@ -1,0 +1,55 @@
+language: php
+
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+  # - nightly
+
+matrix:
+  exclude:
+    # - php: 7.0
+    #   env: TYPO3_VERSION="^9.0"
+    - php: 7.0
+      env: TYPO3_VERSION="^9.1"
+    # - php: 7.1
+    #   env: TYPO3_VERSION="^9.0"
+    - php: 7.1
+      env: TYPO3_VERSION="^9.1"
+    - php: nightly
+      env: TYPO3_VERSION="^8.7"
+  allow_failures:
+    - php: nightly
+
+env:
+  global:
+    - TYPO3_PATH_ROOT=$TRAVIS_BUILD_DIR/.Build
+  matrix:
+    - TYPO3_VERSION="^8.7"
+    # - TYPO3_VERSION="^9.0"
+    - TYPO3_VERSION="^9.1"
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - parallel
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $TRAVIS_BUILD_DIR/.Build/cache
+
+install:
+  - composer diagnose || true
+  - composer validate
+  - composer run:require-typo3-version "$TYPO3_VERSION"
+  - git checkout .
+  - composer check-platform-reqs
+
+script:
+  - composer -v --timeout=0 run-script run:test-coverage
+  - composer -v --timeout=0 run-script run:parallel-test-functional
+  - composer -v run:cs-lint
+  - composer -v run:security-check-bugfix-for-travis

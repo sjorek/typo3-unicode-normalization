@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.5/phpunit.xsd"
+         bootstrap=".Build/vendor/typo3/testing-framework/Resources/Core/Build/UnitTestsBootstrap.php"
+         forceCoversAnnotation="true"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         backupGlobals="true"
+         backupStaticAttributes="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnError="true"
+         stopOnFailure="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         stopOnRisky="false"
+         failOnRisky="true"
+         failOnWarning="true"
+         syntaxCheck="false"
+         verbose="true">
+
+    <testsuite>
+        <directory suffix="Test.php">Tests/Unit</directory>
+    </testsuite>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">Classes</directory>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-html" lowUpperBound="35" highLowerBound="70"/>
+        <log type="coverage-text" showUncoveredFiles="true"/>
+    </logging>
+
+    <php>
+        <ini name="memory_limit" value="384M"/>
+    </php>
+
+</phpunit>
