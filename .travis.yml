@@ -49,7 +49,16 @@ install:
   - composer check-platform-reqs
 
 script:
-  - composer -v --timeout=0 run-script run:test-coverage
-  - composer -v --timeout=0 run-script run:parallel-test-functional
+  - composer -v --timeout=600 run-script run:test-coverage
+  - composer -v --timeout=600 run-script run:parallel-test-functional
   - composer -v run:cs-lint
   - composer -v run:security-check-bugfix-for-travis
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+  slack:
+    on_success: always
+    on_failure: always
+    secure: v/fPxDaYWh/iLOPB3OMgKsnF1MyNDVq5kTHf50/0iRPRQRnWBDSVIGc8fEqTX/X4gRChC7V/cwqHYfwL9RL565TJ+b/3Q7MkppGd1E6VRK5YhDiNARBUiLEGOzoHdKSLoqyHPPjALoRODzTk1icLZ+50NEfuO+mAj2EHgbsThWnx7GbOKxQLR5+zQhFbQQA/lsSWMQTbx1g+uYooy3+Qf2bbkUICGK9z9AC5EYCR4UB5WS1uWM8Bfuj725vwyuqlWqftQVrrXi/mg3oRdvSAD/o8ESgviYHkUo/5Yv+9Y/xlyq8/XUg57zGeB976dXWJZjkJkraJCVTPQwfilI/pPZooLaoECnxMZOLz8Bry3/WI749ANoAjaFNI/VQdjgY5SsRqefrTqUUtWyiaOzS/imr5YQRjqQLluQ+No5dY03rSXg2vtxvtMHitN5pu02eq/dEDh61RQAWNoaPIqymD0p+fow41KoIfT4iTTydwe+sFossm9+fOBLt/vinZ/LffZspG8MMSmny0S7rzALkH8C18UFnklt/8jYKfYFOktAVVQbgEmw4rzmGzdUy2RXR118TPuaAI5KFiu1Y/Eb0B8G0P+61L/7L2MAyytZGK6QLYB9tbF01BZabeNzDdA8P5SCQNM+ikbhYZe9WEFdRtZZWMDqd3vEpZufEFgkUJl40=
