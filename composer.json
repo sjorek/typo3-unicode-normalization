@@ -106,7 +106,7 @@
         ],
         "run:require-typo3-version": [
             "@php -r '$conf=json_decode(file_get_contents(__DIR__.\"/composer.json\"),true);$conf[\"require\"][\"typo3/cms-core\"]=$_SERVER[\"argv\"][1];file_put_contents(__DIR__.\"/composer.json\",json_encode($conf,JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT).chr(10));'",
-            "@composer run:alter-filesystem -- remove composer.lock",
+            "@php -r 'file_exists($file=__DIR__.\"/composer.lock\") && unlink($file);'",
             "@composer install",
             "@php -r '$p=@reset(array_filter(json_decode(shell_exec(PHP_BINARY.\" \".getenv(\"COMPOSER_BINARY\").\" show --format=json\"))->installed,function($p){return $p->name===\"typo3/cms-core\";}));$v=ltrim($p->version,\"v\");if(version_compare($v,\"9.1.0\",\">=\")&&version_compare($v, \"9.2.0\", \"<\")){system(sprintf(\"%s %s require --dev typo3/testing-framework:^2.0.3\",escapeshellcmd(PHP_BINARY),escapeshellarg(getenv(\"COMPOSER_BINARY\"))));}'",
             "@run:clean"
